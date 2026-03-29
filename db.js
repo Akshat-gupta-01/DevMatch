@@ -6,13 +6,15 @@
 // ---- Firebase Config ----
 // Replace these values with your own from https://console.firebase.google.com
 // Steps: Create project → Add Web App → Copy config → Enable Auth (Email/Password) → Enable Firestore
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDemo_ReplaceWithYourOwnKey",
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAUNk16MSg264eDvNruT9UgD44fevF230E",
   authDomain: "devmatch-demo.firebaseapp.com",
   projectId: "devmatch-demo",
-  storageBucket: "devmatch-demo.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:0000000000000000"
+  storageBucket: "devmatch-demo.firebasestorage.app",
+  messagingSenderId: "286315495224",
+  appId: "1:286315495224:web:abcef8a080ac0a62ce0bcd",
+  measurementId: "G-9EF9M0W3D2"
 };
 
 // ---- Firebase Mode Detection ----
