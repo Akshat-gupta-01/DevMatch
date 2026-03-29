@@ -1,0 +1,167 @@
+/* ---- DB Mode Badge ---- */
+.db-mode-badge {
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: default;
+  flex-shrink: 0;
+}
+.db-mode-badge.cloud {
+  background: rgba(0,232,85,0.12);
+  border: 1px solid rgba(0,232,85,0.3);
+  color: var(--primary);
+}
+.db-mode-badge.local {
+  background: rgba(255,213,79,0.1);
+  border: 1px solid rgba(255,213,79,0.3);
+  color: #ffd700;
+}
+
+/* ---- Nav Right ---- */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+/* ---- Logout Button ---- */
+.logout-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text3);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+.logout-btn:hover {
+  background: rgba(255,58,58,0.15);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* ---- Profile Email ---- */
+.profile-email {
+  font-size: 0.82rem;
+  color: var(--text3);
+  margin-top: 4px;
+  font-family: 'Fira Code', monospace;
+}
+
+/* ---- Profile Completion Bar ---- */
+.completion-bar-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.completion-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--text2);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.completion-bar {
+  height: 8px;
+  background: var(--surface2);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.completion-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+}
+.completion-hint {
+  font-size: 0.75rem;
+  color: var(--text3);
+  margin-top: 8px;
+}
+
+/* ---- Availability Pills ---- */
+.avail-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.avail-pill { cursor: pointer; }
+.avail-pill input { display: none; }
+.avail-pill span {
+  display: inline-flex;
+  padding: 7px 16px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 100px;
+  font-size: 0.83rem;
+  font-weight: 500;
+  color: var(--text3);
+  transition: all var(--transition);
+}
+.avail-pill input:checked + span {
+  background: rgba(0,232,85,0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ---- Empty Full (centered full-width) ---- */
+.empty-full {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 80px 20px;
+  text-align: center;
+}
+.empty-full h2 { font-size: 1.4rem; }
+.empty-full p  { color: var(--text2); max-width: 320px; }
+
+/* ---- Empty Actions ---- */
+.empty-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+/* ---- Project Detail Stats ---- */
+.pd-owner-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.pd-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--bg3);
+  border-radius: var(--radius-sm);
+}
+.pd-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.pd-stat span:first-child { font-size: 1.2rem; }
+.pd-stat span:nth-child(2) { font-size: 1rem; font-weight: 700; }
+.pd-stat label { font-size: 0.72rem; color: var(--text3); }
+
+/* ---- data.js no longer needed — keep styles.css trim ---- */

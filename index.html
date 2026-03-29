@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevMatch – Find Your Dream Dev Team</title>
+  <meta name="description" content="Skill-based Tinder for developers. Swipe, match, and build amazing projects with the right teammates." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+  <!-- Firebase SDK (compat mode) — Required for cloud database -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="extras.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav id="navbar" class="navbar">
+    <div class="nav-brand">
+      <span class="brand-icon">⌨️</span>
+      <span class="brand-name">DevMatch</span>
+    </div>
+    <div class="nav-links" id="navLinks">
+      <button class="nav-btn active" data-view="swipe"    onclick="showView('swipe')">
+        <span class="nav-icon">🔥</span> Discover
+      </button>
+      <button class="nav-btn" data-view="matches"  onclick="showView('matches')">
+        <span class="nav-icon">💚</span> Matches
+        <span class="nav-badge" id="matchBadge" style="display:none">0</span>
+      </button>
+      <button class="nav-btn" data-view="projects" onclick="showView('projects')">
+        <span class="nav-icon">🚀</span> Projects
+      </button>
+      <button class="nav-btn" data-view="messages" onclick="showView('messages')">
+        <span class="nav-icon">💬</span> Messages
+        <span class="nav-badge" id="msgBadge" style="display:none">0</span>
+      </button>
+      <button class="nav-btn" data-view="profile"  onclick="showView('profile')">
+        <span class="nav-icon">👤</span> Profile
+      </button>
+    </div>
+    <div class="nav-right">
+      <div class="db-mode-badge" id="dbModeBadge" title="Database mode"></div>
+      <div class="nav-avatar" onclick="showView('profile')">
+        <img src="" id="navAvatar" alt="You" />
+        <div class="online-dot"></div>
+      </div>
+      <button class="logout-btn" onclick="DB.logout()" title="Sign out">⏻</button>
+    </div>
+  </nav>
+
+  <!-- ===== VIEWS CONTAINER ===== -->
+  <div class="views-container">
+
+    <!-- ========== SWIPE VIEW ========== -->
+    <div id="view-swipe" class="view active">
+      <div class="swipe-container">
+        <div class="swipe-header">
+          <h1>Find Your Dev Partner</h1>
+          <div class="filter-pills" id="filterPills">
+            <button class="pill active" onclick="filterSkill(this, '')">All</button>
+            <button class="pill" onclick="filterSkill(this, 'React')">React</button>
+            <button class="pill" onclick="filterSkill(this, 'Python')">Python</button>
+            <button class="pill" onclick="filterSkill(this, 'Node.js')">Node.js</button>
+            <button class="pill" onclick="filterSkill(this, 'AI/ML')">AI/ML</button>
+            <button class="pill" onclick="filterSkill(this, 'DevOps')">DevOps</button>
+            <button class="pill" onclick="filterSkill(this, 'Mobile')">Mobile</button>
+          </div>
+        </div>
+
+        <div class="card-stack" id="cardStack"></div>
+
+        <div class="swipe-actions" id="swipeActions">
+          <button class="action-btn skip"      onclick="swipeCard('left')"  title="Pass">✕</button>
+          <button class="action-btn superlike" onclick="swipeCard('super')" title="Super Like">⭐</button>
+          <button class="action-btn like"      onclick="swipeCard('right')" title="Connect">✓</button>
+        </div>
+
+        <div class="empty-state" id="emptyState" style="display:none">
+          <div class="empty-icon" id="emptyIcon">🔍</div>
+          <h2 id="emptyTitle">No developers yet</h2>
+          <p id="emptyDesc">Be the first! Share this app with other developers so they can join.</p>
+          <div class="empty-actions" id="emptyActions">
+            <button class="btn-primary" onclick="shareApp()">📤 Invite Developers</button>
+            <button class="btn-secondary" onclick="resetCards()">↺ Reset Swipes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== MATCHES VIEW ========== -->
+    <div id="view-matches" class="view">
+      <div class="section-container">
+        <div class="section-header">
+          <h1>Your Matches</h1>
+          <p>Developers who want to collaborate with you</p>
+        </div>
+        <div class="matches-grid" id="matchesGrid"></div>
+      </div>
+    </div>
+
+    <!-- ========== PROJECTS VIEW ========== -->
+    <div id="view-projects" class="view">
+      <div class="section-container">
+        <div class="section-header">
+          <h1>Project Board</h1>
+          <p>Find projects that need your skills, or post your own</p>
+          <button class="btn-primary" onclick="showPostProject()">+ Post Project</button>
+        </div>
+        <div class="project-filters">
+          <input type="text" id="projectSearch" placeholder="🔍 Search projects..." oninput="filterProjects()" class="search-input" />
+          <div class="filter-pills">
+            <button class="pill active" onclick="filterProjectTag(this, '')">All</button>
+            <button class="pill" onclick="filterProjectTag(this, 'hackathon')">Hackathon</button>
+            <button class="pill" onclick="filterProjectTag(this, 'startup')">Startup</button>
+            <button class="pill" onclick="filterProjectTag(this, 'open-source')">Open Source</button>
+            <button class="pill" onclick="filterProjectTag(this, 'learning')">Learning</button>
+          </div>
+        </div>
+        <div class="projects-grid" id="projectsGrid"></div>
+      </div>
+    </div>
+
+    <!-- ========== MESSAGES VIEW ========== -->
+    <div id="view-messages" class="view">
+      <div class="messages-layout">
+        <div class="chat-list" id="chatList">
+          <div class="chat-list-header">
+            <h2>Messages</h2>
+            <input type="text" placeholder="Search..." class="chat-search" oninput="filterChats(this.value)" />
+          </div>
+          <div id="chatItems"></div>
+        </div>
+        <div class="chat-panel" id="chatPanel">
+          <div class="chat-empty">
+            <div class="chat-empty-icon">💬</div>
+            <p>Select a conversation to start messaging</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== PROFILE VIEW ========== -->
+    <div id="view-profile" class="view">
+      <div class="section-container profile-section">
+        <div class="profile-hero">
+          <div class="profile-avatar-wrapper">
+            <img src="" id="profileAvatar" alt="Your avatar" class="profile-avatar" />
+            <button class="avatar-edit-btn" onclick="document.getElementById('avatarUpload').click()">📷</button>
+            <input type="file" id="avatarUpload" style="display:none" accept="image/*" onchange="uploadAvatar(event)" />
+          </div>
+          <div class="profile-info">
+            <div class="profile-name-edit">
+              <h1 id="profileName" contenteditable="true" spellcheck="false">Your Name</h1>
+              <span class="edit-hint">✏️ click to edit</span>
+            </div>
+            <p id="profileTitle" contenteditable="true" spellcheck="false" class="profile-title">Your Role</p>
+            <p class="profile-email" id="profileEmail"></p>
+            <div class="profile-github">
+              <span class="github-icon">🔗</span>
+              <input type="url" id="githubInput" placeholder="https://github.com/username" class="github-input" />
+            </div>
+            <div class="profile-stats">
+              <div class="stat"><span id="statMatches">0</span><label>Matches</label></div>
+              <div class="stat"><span id="statLikes">0</span><label>Likes Given</label></div>
+              <div class="stat"><span id="statProjects">0</span><label>Projects</label></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile completion bar -->
+        <div class="completion-bar-wrap" id="completionWrap">
+          <div class="completion-label">
+            <span>Profile Completeness</span>
+            <span id="completionPct">0%</span>
+          </div>
+          <div class="completion-bar">
+            <div class="completion-fill" id="completionFill"></div>
+          </div>
+          <p class="completion-hint" id="completionHint"></p>
+        </div>
+
+        <div class="profile-body">
+          <div class="profile-card">
+            <h3>About Me</h3>
+            <textarea id="profileBio" rows="4" placeholder="Tell other developers about yourself, what you're working on, and what kind of collaborator you're looking for..."></textarea>
+          </div>
+
+          <div class="profile-card">
+            <h3>My Skills</h3>
+            <div class="skills-input-area">
+              <input type="text" id="skillInput" placeholder="Add a skill (e.g. React, Python...)" class="skill-text-input" onkeydown="addSkillOnEnter(event)" list="skillSuggestions" />
+              <datalist id="skillSuggestions">
+                <option value="React"/><option value="Vue"/><option value="Angular"/>
+                <option value="Node.js"/><option value="Python"/><option value="Django"/>
+                <option value="FastAPI"/><option value="Go"/><option value="Rust"/>
+                <option value="TypeScript"/><option value="JavaScript"/><option value="Java"/>
+                <option value="Flutter"/><option value="React Native"/><option value="Swift"/>
+                <option value="Docker"/><option value="Kubernetes"/><option value="AWS"/>
+                <option value="Firebase"/><option value="MongoDB"/><option value="PostgreSQL"/>
+                <option value="GraphQL"/><option value="AI/ML"/><option value="PyTorch"/>
+                <option value="TensorFlow"/><option value="Next.js"/><option value="Three.js"/>
+                <option value="Figma"/><option value="DevOps"/><option value="Solidity"/>
+              </datalist>
+              <button class="btn-secondary" onclick="addSkill()">Add</button>
+            </div>
+            <div class="skills-tags" id="profileSkills"></div>
+          </div>
+
+          <div class="profile-card">
+            <h3>Looking For</h3>
+            <div class="looking-for-grid">
+              <label class="checkbox-card"><input type="checkbox" id="lf-frontend" /><span>Frontend Dev</span></label>
+              <label class="checkbox-card"><input type="checkbox" id="lf-backend" /><span>Backend Dev</span></label>
+              <label class="checkbox-card"><input type="checkbox" id="lf-ml" /><span>AI/ML Engineer</span></label>
+              <label class="checkbox-card"><input type="checkbox" id="lf-design" /><span>UI/UX Designer</span></label>
+              <label class="checkbox-card"><input type="checkbox" id="lf-devops" /><span>DevOps Engineer</span></label>
+              <label class="checkbox-card"><input type="checkbox" id="lf-mobile" /><span>Mobile Dev</span></label>
+              <label class="checkbox-card"><input type="checkbox" id="lf-cofounder" /><span>Co-founder</span></label>
+              <label class="checkbox-card"><input type="checkbox" id="lf-mentor" /><span>Mentor</span></label>
+            </div>
+          </div>
+
+          <div class="profile-card">
+            <h3>Availability</h3>
+            <div class="avail-pills">
+              <label class="avail-pill"><input type="radio" name="avail" value="Full-time" /><span>Full-time</span></label>
+              <label class="avail-pill"><input type="radio" name="avail" value="Part-time" /><span>Part-time</span></label>
+              <label class="avail-pill"><input type="radio" name="avail" value="Weekends" /><span>Weekends</span></label>
+              <label class="avail-pill"><input type="radio" name="avail" value="Evenings" /><span>Evenings</span></label>
+              <label class="avail-pill"><input type="radio" name="avail" value="Flexible" checked /><span>Flexible</span></label>
+            </div>
+          </div>
+
+          <div class="profile-card">
+            <h3>GitHub Activity</h3>
+            <div id="githubStats" class="github-stats-panel">
+              <button class="btn-secondary" onclick="loadGitHubStats()">🔗 Load GitHub Stats</button>
+            </div>
+          </div>
+
+          <button class="btn-primary save-btn" onclick="saveProfile()">💾 Save Profile</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /views-container -->
+
+  <!-- ===== MATCH MODAL ===== -->
+  <div class="match-modal" id="matchModal">
+    <div class="match-modal-content">
+      <div class="match-fireworks"></div>
+      <h2 class="match-title">It's a Match! 🎉</h2>
+      <div class="match-avatars">
+        <img src="" id="matchAvatar1" alt="You" />
+        <div class="match-heart">💚</div>
+        <img src="" id="matchAvatar2" alt="Match" />
+      </div>
+      <h3 id="matchName"></h3>
+      <p id="matchDesc"></p>
+      <div class="match-modal-actions">
+        <button class="btn-secondary" onclick="closeMatchModal()">Keep Swiping</button>
+        <button class="btn-primary" onclick="goToChat()">Send Message 💬</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== POST PROJECT MODAL ===== -->
+  <div class="modal-overlay" id="projectModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Post a Project</h2>
+        <button class="modal-close" onclick="closeProjectModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <label>Project Name *</label>
+        <input type="text" id="projName" placeholder="e.g. AI Resume Builder" class="modal-input" />
+        <label>Description *</label>
+        <textarea id="projDesc" rows="3" placeholder="What are you building and why?" class="modal-input"></textarea>
+        <label>Tech Stack (comma separated)</label>
+        <input type="text" id="projStack" placeholder="React, Node.js, MongoDB" class="modal-input" />
+        <label>Roles Needed</label>
+        <input type="text" id="projRoles" placeholder="Frontend Dev, ML Engineer" class="modal-input" />
+        <label>Type</label>
+        <select id="projType" class="modal-input">
+          <option value="hackathon">Hackathon</option>
+          <option value="startup">Startup</option>
+          <option value="open-source">Open Source</option>
+          <option value="learning">Learning Project</option>
+        </select>
+        <label>GitHub Repo (optional)</label>
+        <input type="text" id="projGithub" placeholder="https://github.com/user/repo" class="modal-input" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeProjectModal()">Cancel</button>
+        <button class="btn-primary" onclick="submitProject()">🚀 Post Project</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PROJECT DETAIL MODAL ===== -->
+  <div class="modal-overlay" id="projectDetailModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 id="pdTitle"></h2>
+        <button class="modal-close" onclick="closeProjectDetailModal()">✕</button>
+      </div>
+      <div class="modal-body" id="pdBody"></div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeProjectDetailModal()">Close</button>
+        <button class="btn-primary" id="pdApplyBtn" onclick="applyToProject()">🙋 Apply to Join</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Scripts -->
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
