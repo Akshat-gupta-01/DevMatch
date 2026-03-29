@@ -38,7 +38,7 @@ DevMatch is a full-stack web application that connects developers based on their
 
 ### Database
 
-* MongoDB
+* Firebase
 
 ### Tools & Utilities
 
